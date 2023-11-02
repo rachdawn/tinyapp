@@ -77,6 +77,17 @@ app.post("/urls/:id/delete", (req, res) => {
     }
 });
 
+app.post("/urls/:id/update", (req, res) => {
+    const id = req.params.id;
+    const updatedURL = req.body.updatedURL;
+    if (urlDatabase[id]) {
+        urlDatabase[id] = updatedURL;
+        res.redirect("/urls");
+    } else {
+        res.status(404).send("URL not found")
+    }
+});
+
 
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");

@@ -13,15 +13,28 @@
 
   <body>
     <div class="card text-center">
-      <div class="card-header">
-        <%- include('partials/_header') %>
-      </div>
+      <div class="card-header"><%- include('partials/_header') %></div>
       <div class="card-body">
         <h5 class="card-title">TinyURL for: <%= longURL %></h5>
         <p class="card-text">
           Short URL ID: <a href="/u/<%= id %>"><%= id %></a>
         </p>
       </div>
+        <form action="/urls/<%= id %>/update" method="POST">
+        <div class="form-group" >
+          <h3>Edit</h3>
+          <div class="form-inline" >
+          <label for="updatedURL">New URL:</label>
+          <input 
+            class="form-control"
+            type="text"
+            id="updatedURL"
+            name="updatedURL" 
+            required/>
+          <button type="submit" class="btn btn-primary">Update URL</button>
+          </div>
+        </div>
+        </form>
       <div class="card-footer text-muted"></div>
     </div>
     <!-- Bootstrap JS -->
