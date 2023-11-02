@@ -88,6 +88,17 @@ app.post("/urls/:id/update", (req, res) => {
     }
 });
 
+app.post('/login', (req, res) => {
+    const { username } = req.body;
+
+    if (username) {
+        res.cookie('username', username);
+        res.redirect('/urls');
+    } else {
+        res.status(400).send('Bad Request - Please provide a username');
+    }
+});
+
 
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
