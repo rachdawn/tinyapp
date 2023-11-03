@@ -100,6 +100,13 @@ app.post("/urls/:id/update", (req, res) => {
     };
 });
 
+//logout
+app.post("/logout", (req, res) => {
+    res.clearCookie('username');
+    res.redirect('/urls');
+})
+
+//login
 app.post("/login", (req, res) => {
     const { username } = req.body;
     if (username) {
@@ -109,6 +116,8 @@ app.post("/login", (req, res) => {
         res.status(400).send('Bad Request - Please provide a username');
     };
 });
+
+
 
 
 app.get("/hello", (req, res) => {
