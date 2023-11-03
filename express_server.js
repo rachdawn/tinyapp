@@ -1,4 +1,5 @@
 const express = require("express");
+const cookieParser = require('cookie-parser')
 const app = express();
 const PORT = 8080; // default port 8080
 
@@ -17,6 +18,7 @@ console.log(generateRandomString());
 
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
@@ -37,16 +39,26 @@ app.get("/urls.json", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = { 
+    urls: urlDatabase,
+    username: req.cookies["username"],
+  };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templateVars = {
+    username: req.cookies["username"],
+  };
+  res.render("urls_new", templateVars);
 });
 
 app.get("/urls/:id", (req, res) => {
-  const templateVars = { id: req.params.id, longURL: urlDatabase[req.params.id] };
+  const templateVars = {
+    id: req.params.id,
+    longURL: urlDatabase[req.params.id],
+    username: req.cookies["username"],
+  };
   res.render("urls_show", templateVars);
 });
 
@@ -74,7 +86,7 @@ app.post("/urls/:id/delete", (req, res) => {
         res.redirect("/urls");
     } else {
         res.status(404).send("URL not found");
-    }
+    };
 });
 
 app.post("/urls/:id/update", (req, res) => {
@@ -85,18 +97,17 @@ app.post("/urls/:id/update", (req, res) => {
         res.redirect("/urls");
     } else {
         res.status(404).send("URL not found")
-    }
+    };
 });
 
-app.post('/login', (req, res) => {
+app.post("/login", (req, res) => {
     const { username } = req.body;
-
     if (username) {
         res.cookie('username', username);
         res.redirect('/urls');
     } else {
         res.status(400).send('Bad Request - Please provide a username');
-    }
+    };
 });
 
 
