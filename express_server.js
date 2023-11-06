@@ -4,6 +4,10 @@ const e = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 
+app.set("view engine", "ejs");
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
 //implement a function that generates a random 6-digit alphanumeric string
 function generateRandomString() {
   const characters =
@@ -17,13 +21,32 @@ function generateRandomString() {
 }
 console.log(generateRandomString());
 
-app.set("view engine", "ejs");
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+//email in database checker
+const isUser = function(email, users) {
+for (const user in users) {
+    let userObject = {};
+    if (users[user]['email'] === email) {
+        userObject = users[user];
+        return userObject;
+    }
+  }
+  return null;
+};
+
+//link urlDatabase to userID
+const urlOwner = function(userID) {
+    const userUrls = {};
+    for (const id of urlDatabase) {
+        if (urlDatabase[id].userID === userID) {
+            userUrls[id] = urlDatabase[id];
+        }
+    }
+    return userUrls;
+};
 
 const urlDatabase = {
-  b2xVn2: "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com",
+  b2xVn2: { longURL: "http://www.lighthouselabs.ca", userID: '8PVbhk' },
+  "9sm5xK": { longURL: "http://www.google.com", userID: '8PVbhk' },
 };
 
 const users = { 
@@ -39,17 +62,6 @@ const users = {
   },
 };
 
-//email in database checker
-const isUser = function(email, users) {
-for (const user in users) {
-    let userObject = {};
-    if (users[user]['email'] === email) {
-        userObject = users[user];
-        return userObject;
-    }
-  }
-  return null;
-};
 
 //PORT
 app.listen(PORT, () => {
@@ -60,30 +72,27 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-//HOME
-app.get("/", (req, res) => {
-//   const user = users[userID];
-//   const templateVars = {
-//     email: user.email,
-//   }
-  res.render("urls_index");
-});
-
 app.get("/urls", (req, res) => {
+  if (!req.cookies.email) {
+    res.redirect("/login");
+  }
   const userID = req.cookies.userID;
   const templateVars = {
     urls: urlDatabase,
     email: req.cookies.email,
-    user: req.cookies["userID", userID],
+    user: req.cookies[("userID", userID)],
   };
   res.render("urls_index", templateVars);
 });
 
 app.get("/urls/new", (req, res) => {
+  if (!req.cookies.email) {
+    res.redirect("/login");
+  }
   const userID = req.cookies.userID;
   const templateVars = {
     email: req.cookies.email,
-    user: req.cookies["userID", userID],
+    user: req.cookies[("userID", userID)],
   };
   res.render("urls_new", templateVars);
 });
@@ -139,10 +148,14 @@ app.post("/urls/:id/update", (req, res) => {
 
 //LOGIN
 app.get("/login", (req, res) => {
+  if (req.cookies.email) {
+    res.redirect("/urls");
+  } else {
     const templateVars = {
-        email: req.cookies['email']
+      email: null,
     };
-    res.render('urls_login', templateVars);
+    res.render("urls_login", templateVars);
+  }
 });
 
 app.post("/login", (req, res) => {
@@ -160,7 +173,7 @@ app.post("/login", (req, res) => {
   //if isUser true => attach cookie and redirect to urls
   if (isUser(email, users)) {
     if (password !== isUser(email, users).password) {
-      return res.status(403).send("Invalid password")
+      return res.status(403).send("Invalid password.")
     }
   } 
     res.cookie("email", email);
@@ -169,7 +182,14 @@ app.post("/login", (req, res) => {
 
 //REGISTER
 app.get("/register", (req, res) => {
-    res.render("urls_register");
+    if (req.cookies.email) {
+        res.redirect('/urls');
+    } else {
+      const templateVars = {
+        email: null
+      };
+    res.render("urls_register", templateVars);
+    }
 });
 
 app.post("/register", (req, res) => {
