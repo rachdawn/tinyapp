@@ -19,9 +19,9 @@
       </div>
     </div>
     <div class="navbar-nav">
-      <% if(email){ %>
+      <% if(user){ %>
       <form method="POST" action="/logout" class="form-inline ml-auto">
-        <span class="navbar-text mr-2">Welcome, <%= email %>!</span>
+        <span class="navbar-text mr-2">Welcome, <%= user.email %>!</span>
         <button type="submit" class="btn btn-outline-light">Logout</button>
       </form>
       <% } else{ %>
