@@ -12,7 +12,8 @@
   </head>
   <body>
     <div class="card-header"><%- include('partials/_header') %></div>
-    <h1>Login:</h1>
+    <h1 style="display: flex; justify-content: center;">Login:</h1 >
+    <div style="display: flex; justify-content: center;">
     <form class="form-group" action="/login" method="POST">
       <label for="email">E-mail:</label>
       <input
@@ -32,5 +33,6 @@
       <br />
       <button type="submit" class="btn btn-primary">Submit</button>
     </form>
+    </div>
   </body>
 </html>
